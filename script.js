@@ -407,12 +407,68 @@ window.addEventListener('click', (e) => {
 });
 
 // Gallery item interactions
-document.querySelectorAll('.gallery-item').forEach(item => {
+document.querySelectorAll('.gallery-item').forEach((item, index) => {
     item.addEventListener('click', function() {
-        this.style.transform = 'scale(1.2) rotate(5deg)';
-        setTimeout(() => {
-            this.style.transform = '';
-        }, 300);
+        const img = this.querySelector('.gallery-image');
+        
+        // Create fullscreen overlay
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10002;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            animation: fadeIn 0.3s ease;
+        `;
+        
+        const fullImg = document.createElement('img');
+        fullImg.src = img.src;
+        fullImg.style.cssText = `
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            animation: zoomIn 0.5s ease;
+        `;
+        
+        overlay.appendChild(fullImg);
+        document.body.appendChild(overlay);
+        
+        // Close on click
+        overlay.addEventListener('click', () => {
+            overlay.style.animation = 'fadeOut 0.3s ease';
+            setTimeout(() => overlay.remove(), 300);
+        });
+        
+        // Add animations
+        if (!document.querySelector('#fullscreen-animations')) {
+            const style = document.createElement('style');
+            style.id = 'fullscreen-animations';
+            style.textContent = `
+                @keyframes zoomIn {
+                    from {
+                        transform: scale(0);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: scale(1);
+                        opacity: 1;
+                    }
+                }
+                @keyframes fadeOut {
+                    from { opacity: 1; }
+                    to { opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
     });
 });
 
